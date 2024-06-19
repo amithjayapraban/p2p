@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --green: #3ef994;
   --textc:#323232;
@@ -15,5 +18,5 @@
 html,body {
   display:flex;
   flex-direction:column;
-  overflow-y: hidden;
+  /* overflow:hidden; */
 }

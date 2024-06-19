@@ -4,7 +4,7 @@ export default function Logo({ baseURL, connection }: any) {
       onClick={() => {
         window.location.assign(baseURL);
       }}
-      className="logo cursor-pointer h-6 w-6 flex justify-items-start  items-start  self-center  "
+      className="logo  cursor-pointer h-8 w-8 flex justify-items-start  items-start  self-center  "
       width="512"
       height="512"
       viewBox="0 0 512 512"

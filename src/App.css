@@ -13,9 +13,7 @@ body {
   box-sizing: border-box;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 .pulsing {
   width: 30px;
   height: 30px;
