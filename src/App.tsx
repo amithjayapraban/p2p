@@ -245,12 +245,12 @@ function App() {
     document.querySelector(".toast")?.classList.toggle("completed_animation");
     setTimeout(() => {
       percentage.textContent = ``;
+      prog.classList.add("w-0");
+      prog.style.width = `0%`;
     }, 1000);
-     setTimeout(() => {
-       document
-         .querySelector(".toast")
-         ?.classList.toggle("completed_animation");
-     }, 2000);
+    setTimeout(() => {
+      document.querySelector(".toast")?.classList.toggle("completed_animation");
+    }, 2000);
   }
   var type = useRef("");
   peerConnection.current.ondatachannel = (e: any) => {
@@ -309,13 +309,12 @@ function App() {
           clientDc.send("next_file");
           prog.classList.add("w-0");
           prog.style.width = `0%`;
-           percentage.textContent = ``;
+          percentage.textContent = ``;
         }, 1000);
         setTimeout(() => {
           document
             .querySelector(".toast")
             ?.classList.toggle("completed_animation");
-         
         }, 2000);
       }
       if (

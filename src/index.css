@@ -3,21 +3,22 @@
 @tailwind utilities;
 :root {
   --green: #3ef994;
-  --textc:#323232;
+  --textc: #323232;
   --bg: #fafafa;
-   --gray:#f0f0f0;
-    --textgray:#c4c4c4;
-    --progress:0;
+  --gray: #f0f0f0;
+  --textgray: #c4c4c4;
+  --progress: 0;
 }
 
 [data-theme="dark"] {
-  --bg:#121212;
+  --bg: #121212;
   --textc: #fafafa;
-  --gray:#1f1f1f;
-   --textgray:#4f4f4f;
+  --gray: #1f1f1f;
+  --textgray: #4f4f4f;
 }
-html,body {
-  display:flex;
-  flex-direction:column;
-  /* overflow:hidden; */
+html,
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
