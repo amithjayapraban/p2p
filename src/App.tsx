@@ -4,6 +4,7 @@ import { generateUsername } from "unique-username-generator";
 import Info from "./components/Info";
 import Logo from "./components/Logo";
 import { getDeviceType } from "./utils/getDeviceType";
+import Progress from "./components/Progress";
 // import ToggleTheme from "./components/ToggleTheme";
 
 function App() {
@@ -28,7 +29,6 @@ function App() {
     ],
   };
 
-  const notificationAudio: any = document.getElementById("notification");
   useEffect(() => {
     name.current = generateUsername("", 0, 8);
     setmyName(name.current);
@@ -61,9 +61,9 @@ function App() {
     let device = getDeviceType();
     const url = `${wsURL}/${name.current}/${device}`;
     ws.current = new WebSocket(url);
-    ws.current.onopen = () => console.log("ws open");
-    ws.current.onerror = () => console.error("WebSocket err");
-    ws.current.onclose = () => console.error("WebSocket disconnected");
+    ws.current.onopen = () => console.log("WebSocket Open");
+    ws.current.onerror = () => console.error("WebSocket Error");
+    ws.current.onclose = () => console.error("WebSocket Disconnected");
     ws.current.onmessage = (e: any) => {
       if (typeof e.data != "string") return;
       const message = JSON.parse(e.data);
@@ -139,18 +139,19 @@ function App() {
   };
 
   peerConnection.current.addEventListener("connectionstatechange", (event) => {
-    console.log(peerConnection.current.connectionState, "connectionState");
     if (
       peerConnection.current.connectionState === "disconnected" ||
       peerConnection.current.connectionState === "failed"
     ) {
       setConnection(false);
-      window.document.title = "iP2P | Disconnected";
+      window.document.title = "iP2P / Disconnected";
+      console.error(peerConnection.current.connectionState);
     }
 
     if (peerConnection.current.connectionState === "connected") {
       setConnection(true);
-      window.document.title = "iP2P | Connected ";
+      window.document.title = "iP2P / Connected ";
+      console.log("WS", peerConnection.current.connectionState);
     }
   });
 
@@ -167,7 +168,7 @@ function App() {
     );
   }
 
-  var files: any = [];
+  let files: any = [];
   var prog: any = document.getElementById("progress");
   const fileAdd = (e: any) => {
     e.preventDefault();
@@ -190,10 +191,6 @@ function App() {
         files.length > 0 && console.log(files[0]);
       }
     });
-    // File transfer animation
-
-    let name: any = document.querySelector(".toast");
-    name.innerHTML = "Transfer Completed ⚡";
   };
 
   let chunkSize = 64000; // 64 KB
@@ -217,6 +214,7 @@ function App() {
       ? 1024 * 1024 * 4
       : 1024 * 1024 * 4;
     var prog: any = document.getElementById("progress");
+    const percentage: any = document.getElementById("percentage");
     prog.style.opacity = "1";
     while (offset.current < file.size) {
       while (dataChannel.bufferedAmount > bufferSize) {
@@ -233,79 +231,92 @@ function App() {
       });
       dataChannel.send(arrayBuffer);
       prog.style.width = `${Math.abs(offset.current / file.size) * 100}%`;
+
+      percentage.textContent = `${(
+        Math.abs(offset.current / file.size) * 100
+      ).toFixed(2)}%`;
       console.log(prog.style.width, "%%%");
       offset.current += chunkSize;
     }
     dataChannel.send("completed");
+    percentage.textContent = `100%`;
+    let name: any = document.querySelector(".toast");
+    name.innerHTML = "File Sent";
     document.querySelector(".toast")?.classList.toggle("completed_animation");
     setTimeout(() => {
-      document.querySelector(".toast")?.classList.toggle("completed_animation");
+      percentage.textContent = ``;
     }, 1000);
+     setTimeout(() => {
+       document
+         .querySelector(".toast")
+         ?.classList.toggle("completed_animation");
+     }, 2000);
   }
-
   var type = useRef("");
-  var blobUrl: any;
-
   peerConnection.current.ondatachannel = (e: any) => {
-    var clientDc: any = e.channel;
-    var file;
-    var fileChunks: any = [];
-    var total_chunks: number,
+    let fileChunks: any = [];
+    let blobUrl: any;
+    let file;
+    let total_chunks: number,
       iterator: number = 0;
-    clientDc.addEventListener("message", (e: any) => {
-      var prog1: any = document.querySelector(".progress");
-      prog1.classList.remove("w-0");
-      var prog: any = document.getElementById("progress");
+    let clientDc: any = e.channel;
 
+    const messageHandler = (e: any) => {
+      const percentage: any = document.getElementById("percentage");
+      const prog: any = document.getElementById("progress");
+      prog.classList.remove("w-0");
       if (e.data.toString()) {
         if (e.data.toString().includes("len")) {
           total_chunks = e.data.toString().split("%")[1];
         }
         if (e.data.toString().includes("type:")) {
-          // let k = e.data.toString();
-          // prog.style.width = `${Math.abs(k)}%`;
           console.log(e.data, "type");
           type.current = e.data.toString();
         }
       }
 
       if (e.data.toString() === "completed") {
+        percentage.textContent = `100%`;
         [iterator, total_chunks] = [0, 0];
         console.log("completed on client");
-        // triggerNotification();
         file = new Blob(fileChunks);
         let t = type.current;
         blobUrl = URL.createObjectURL(file);
-        var link = document.createElement("a");
+        let link = document.createElement("a");
         link.href = blobUrl;
         link.download = t.substring(5);
         document.body.appendChild(link);
-        var a = link.dispatchEvent(
+        link.dispatchEvent(
           new MouseEvent("click", {
             bubbles: true,
             cancelable: true,
             view: window,
           })
         );
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        notificationAudio.play();
         let name: any = document.querySelector(".toast");
-        name.innerHTML = "File recieved ⚡";
+        name.innerHTML = "File recieved";
         document
           .querySelector(".toast")
           ?.classList.toggle("completed_animation");
 
         setTimeout(() => {
-          console.log(fileChunks, "fileChunks");
-          fileChunks = [];
+          URL.revokeObjectURL(blobUrl);
+          file = null;
+          blobUrl = null;
+          fileChunks.length = 0;
+          document.body.removeChild(link);
+          type.current = "";
           clientDc.send("next_file");
+          prog.classList.add("w-0");
+          prog.style.width = `0%`;
+           percentage.textContent = ``;
+        }, 1000);
+        setTimeout(() => {
           document
             .querySelector(".toast")
             ?.classList.toggle("completed_animation");
-          prog.classList.add("w-0");
-          prog.style.width = `0%`;
-        }, 1000);
+         
+        }, 2000);
       }
       if (
         e.data.toString() !== "completed" &&
@@ -316,16 +327,22 @@ function App() {
         iterator += 64000;
         console.log(e.data, "chunks");
         prog.style.width = `${Math.abs(iterator / total_chunks) * 100}%`;
+
+        percentage.textContent = `${(
+          Math.abs(iterator / total_chunks) * 100
+        ).toFixed(2)}%`;
         // clientDc.send("send_next_partition");
         fileChunks.push(e.data);
       }
-    });
+    };
+
+    clientDc.addEventListener("message", messageHandler);
   };
 
   return (
     <div className="flex flex-col  shadow-sm  app relative text-textc  h-[100dvh] ">
-      <div className="text-white   bg-[var(--textgray)] toast completed_animation absolute top-3   right-[25%] left-[25%]  flex items-center justify-center  rounded-3xl   p-2 z-[66] text-xs ">
-        Transfer Completed ⚡
+      <div className="text-white  bg-bg border border-[var(--gray)]   toast completed_animation absolute top-6   right-[25%] left-[25%]  flex items-center justify-center   rounded-[10px]    p-2 z-[66] text-xs ">
+        File Sent
       </div>
 
       <section className="flex items-center p-6 justify-between w-full ">
@@ -345,6 +362,7 @@ function App() {
         <section className=" h-full overflow-y-auto self-center w-full md:w-[max-content] md:max-w-[80%]  flex justify-center items-center bg- [rgba(250,250,250,.1)] flex-wrap  transition text-white      ">
           {peers.map((i: any, n) => (
             <button
+              key={i}
               onClick={() => {
                 setRecieverDeviceType(i.split("%")[1]);
                 offerPeerConnection(i);
@@ -360,6 +378,7 @@ function App() {
               />
               {i.split("%").map((ele: string, n: any) => (
                 <p
+                  key={ele}
                   className={`${
                     n == 1 ? `text-gray-500 text-[.6rem]` : `text-textc`
                   }`}
@@ -373,9 +392,10 @@ function App() {
           ))}
         </section>
       ) : (
-        <section className=" h-full self-center w-full md:w-1/2   transition-[1] flex items-center justify-center  flex-col  text-xs text-white  gap-1  ">
+        <section className=" h-full relative self-center w-full md:w-1/2   transition-[1] flex items-center justify-center  flex-col  text-xs text-white  gap-1  ">
+          <Progress />
           <label
-            className={` bor der border-[var(--gray)] px-1 flex flex-col items-center justify-center  w-28 h-28 cursor-pointer  rounded-full text-xs  `}
+            className={` bor der  border-[var(--gray)] px-1 flex flex-col items-center justify-center  w-28 h-28 cursor-pointer  rounded-full text-xs  `}
           >
             {" "}
             <img
@@ -394,6 +414,7 @@ function App() {
           <span className="flex justify-center flex-col items-center">
             {destination.split("%").map((ele: string, n: any) => (
               <p
+                key={ele}
                 className={`${
                   n == 1 ? `text-gray-400 text-[.6rem]` : `text-textc`
                 }`}
