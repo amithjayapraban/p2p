@@ -24,17 +24,20 @@ export default function Info() {
         </svg>
       </PopoverTrigger>
       <PopoverContent className=" bg-bg border border-[var(--gray)]  p-4  rounded-xl md:min-w-[30vw]  min-w-[70vw] break-words md:max-w-[40vw] max-w-[80vw] md:right-1 right-1 md:top-1 top-1  absolute z-[99]">
-        <ul className=" text-xs  flex flex-col gap-2">
+        <ul className="pl-1 text-xs  flex flex-col gap-2">
           <li className=" border-b border-[var(--gray)] ">
             {" "}
-            🔍 <br /> &nbsp; Make sure the devices are in the same network
+            🔍 <br />{" "}
+            <p className="">Make sure the devices are in the same network.</p>
           </li>
           <li className=" border-b border-[var(--gray)] ">
             {" "}
-            📂 <br /> &nbsp; Select the other device and then choose the files
-            to send
+            📂 <br />{" "}
+            <p className="">
+              Select the other device and then choose the files to send.
+            </p>
           </li>
-          <li className="font- semibold italic text-[var(--textgray)] text-[.7rem]">
+          <li className="italic text-[var(--textgray)] text-[.7rem]">
             &nbsp;Found any bugs? <br /> &nbsp;Reach out{" "}
             <a
               href="https://amith.vercel.app"

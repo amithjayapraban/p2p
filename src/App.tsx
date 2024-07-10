@@ -5,6 +5,7 @@ import Info from "./components/Info";
 import Logo from "./components/Logo";
 import { getDeviceType } from "./utils/getDeviceType";
 import Progress from "./components/Progress";
+import { Analytics } from "@vercel/analytics/react";
 // import ToggleTheme from "./components/ToggleTheme";
 
 function App() {
@@ -340,6 +341,7 @@ function App() {
 
   return (
     <div className="flex flex-col  shadow-sm  app relative text-textc  h-[100dvh] ">
+      <Analytics />
       <div className="text-white  bg-bg border border-[var(--gray)]   toast completed_animation absolute top-6   right-[25%] left-[25%]  flex items-center justify-center   rounded-[10px]    p-2 z-[66] text-xs ">
         File Sent
       </div>
