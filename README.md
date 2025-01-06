@@ -35,9 +35,9 @@ A P2P file sharing web app. <br/> Uses WebSockets for signalling.
 
 
 <div align="left">
-<img src="public/scrn1.png"  width="300" />
+
   <img src="public/scrn3.png"  width="250" />
-  <img src="public/scrn2.png"  width="200" />
+ 
 </div>
 
 
@@ -113,10 +113,7 @@ Distributed under the MIT License.
 
 
 
-<!-- CONTACT -->
-## Contact
 
-Amith Jayapraban - [@amithjayapraban](https://twitter.com/amithjayapraban)  
 
 
 
